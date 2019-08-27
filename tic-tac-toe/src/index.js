@@ -2,8 +2,10 @@ import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
 
+// square functional component is controlled by the Board component - child component of the Board
 const Square = props => {
   return (
+    // onClick props function passed down from Board component - just returns the square's value from parent props.
     <button className="square" onClick={props.onClick}>
       {props.value}
     </button>
@@ -11,10 +13,14 @@ const Square = props => {
 };
 
 class Board extends React.Component {
+  // render square function used to pass down props to Square child component
   renderSquare(i) {
     return (
+      // Square child component
       <Square
+        //square value
         value={this.props.squares[i]}
+        // onClick function 
         onClick={() => this.props.onClick(i)}
       />
     );
@@ -23,6 +29,7 @@ class Board extends React.Component {
   render() {
     return (
       <div>
+        {/* board rendered */}
         <div className="board-row">
           {this.renderSquare(0)}
           {this.renderSquare(1)}
@@ -115,16 +122,24 @@ class Game extends React.Component {
     // used for when a winner is determined.
     const winner = calculateWinner(current.squares);
 
-    // 
+    // tracking moves within the game. 
+    // this is to allow users to move backwards within history
+    // loop over the array
     const moves = history.map((step, move) => {
+      // print out the move at that moment and capture it in a variable
+      // default if no move is Go To Game Start - ternary expression.
       const desc = move ? "Go to move #" + move : "Go to game start";
       return (
+        // key used to help React ID which items are added, removed or changed within the application. 
+        // keys should be given to the elements inside the array to give elements a unique identity. 
         <li key={move}>
+          {/* button click rendered to page. user click triggers jumpTo() function to move user back to that moment of the game. */}
           <button onClick={() => this.jumpTo(move)}>{desc}</button>
         </li>
       );
     });
 
+    // code helps announce winner - status variable, then mutated to alert next user move or announce winner.
     let status;
     if (winner) {
       status = "Winner " + winner;
@@ -135,10 +150,13 @@ class Game extends React.Component {
     return (
       <div className="game">
         <div className="game-board">
+          {/* renders the current squares on the board. Re-renders after each user click from onClick function (either user X or O) */}
           <Board squares={current.squares} onClick={i => this.handleClick(i)} />
         </div>
         <div className="game-info">
+          {/* renders status of game */}
           <div>{status}</div>
+          {/* renders each user X & O move */}
           <ol>{moves}</ol>
         </div>
       </div>
@@ -146,6 +164,7 @@ class Game extends React.Component {
   }
 }
 
+// logic to calculate game winner
 const calculateWinner = squares => {
   const lines = [
     [0, 1, 2],
