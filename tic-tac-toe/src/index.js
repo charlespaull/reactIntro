@@ -46,48 +46,76 @@ class Board extends React.Component {
 class Game extends React.Component {
   constructor(props) {
     super(props);
+    // Game state that holds the board & square states. Each user move will be captured and a "state" of the board will be captured in "history" to log each user's move until there is a winner. 
     this.state = {
+      // state that captures the "state" of the board after each user move. Every square starts off as null.
+      // users will input an X or O as their move and update the square's state.
       history: [
         {
+        // the board - starts off as every square state of null
           squares: Array(9).fill(null)
         }
       ],
+      // the current step in the game, in number form. Default is zero for start, and each user move adds 1.
       stepNumber: 0,
+      // boolean to determine if user X or O is next. Default (true) is X.
       xIsNext: true
     };
   }
 
+  // function that updates state after a square is clicked on the board. 
+  // Also has logic to return if a user has won the game. 
   handleClick(i) {
+    // variable grabs history state at exact moment (after each user play). (null, X, O are 3 possible states).
+    // Slice creates copy of each object within the array - this gives the TOTAL snapshot of the history array after each play. This is the "STATE" of the board at that moment.
     const history = this.state.history.slice(0, this.state.stepNumber + 1);
+    // current is the last iteration of the array (the most recent user play)
     const current = history[history.length - 1];
+    // square variable is the slice of the last board play 
     const squares = current.squares.slice();
+    // logic used to return early if the a user has won or if clicked square was already played (state is NOT null).
     if (calculateWinner(squares) || squares[i]) {
       return;
     }
+    // square variable at i is looking to check if X or O user is up for next turn (ternary expression)
     squares[i] = this.state.xIsNext ? "X" : "O";
     this.setState({
+      // setting state (replacing null with X or O) based off above ternary statement.
+      // concat used rather than push because it does not mutate array.
       history: history.concat([
         {
+          // square that user clicked within the board updated with X or O from above.
           squares: squares
         }
       ]),
+      // step number increases after every user play (this is determined by length of total history array)
       stepNumber: history.length,
+      // T/F boolean to switch between X & O user.
       xIsNext: !this.state.xIsNext
     });
   }
 
+  // function used to move backwards in game
   jumpTo(step) {
     this.setState({
+      // parameter input is move clicked on by user
+      // step is captured and updarted in state
       stepNumber: step,
+      // checks to see if step was for user X or O - (affects boolean T/F)
       xIsNext: (step % 2) === 0
     });
   };
 
+  // this is rendering to the page
   render() {
+    // renders the board at that exact snapshot in time.
     const history = this.state.history;
+    // shows the current step number in the board game.
     const current = history[this.state.stepNumber];
+    // used for when a winner is determined.
     const winner = calculateWinner(current.squares);
 
+    // 
     const moves = history.map((step, move) => {
       const desc = move ? "Go to move #" + move : "Go to game start";
       return (
